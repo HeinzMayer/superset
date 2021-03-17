@@ -162,6 +162,10 @@ class QueryContext:
                 "query": self.datasource.get_query_str(query_obj.to_dict()),
                 "language": self.datasource.query_language,
             }
+
+        if len(query_obj.columns) < 1:
+          query_obj.columns = [o.column_name for o in self.datasource.columns]
+
         if self.result_type == utils.ChartDataResultType.SAMPLES:
             row_limit = query_obj.row_limit or math.inf
             query_obj = copy.copy(query_obj)
@@ -180,6 +184,7 @@ class QueryContext:
             payload["data"] = self.get_data(df)
         del payload["df"]
 
+        
         filters = query_obj.filter
         filter_columns = cast(List[str], [flt.get("col") for flt in filters])
         columns = set(self.datasource.column_names)
