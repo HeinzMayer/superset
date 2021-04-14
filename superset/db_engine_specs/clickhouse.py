@@ -20,6 +20,19 @@ from typing import Dict, Optional, Type
 from superset.db_engine_specs.base import BaseEngineSpec
 from superset.db_engine_specs.exceptions import SupersetDBAPIDatabaseError
 from superset.utils import core as utils
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Match,
+    NamedTuple,
+    Optional,
+    Pattern,
+    Tuple,
+    TYPE_CHECKING,
+    Union,
+)
 
 
 class ClickHouseEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
@@ -68,4 +81,24 @@ class ClickHouseEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
             return f"toDate('{dttm.date().isoformat()}')"
         if tt == utils.TemporalType.DATETIME:
             return f"""toDateTime('{dttm.isoformat(sep=" ", timespec="seconds")}')"""
+        return None
+
+    @classmethod
+    def get_datatype(cls, type_code: Any) -> Optional[str]:
+        """
+        Change column type code from cursor description to string representation.
+
+        :param type_code: Type code from cursor description
+        :return: String representation of type code
+        """
+         
+        type_code = type_code.upper()
+ 
+        if (type_code.find('NULLABLE(') != -1): 
+          type_code = type_code.replace("NULLABLE(", "")
+          type_code = type_code.replace(")", "",1)
+
+
+        if isinstance(type_code, str) and type_code != "":
+            return type_code.upper()
         return None
