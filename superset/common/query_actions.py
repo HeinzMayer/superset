@@ -175,6 +175,12 @@ def get_query_results(
     :return: JSON serializable result payload
     """
     result_func = _result_type_functions.get(result_type)
+  
+    if len(query_obj.columns) < 1:
+      datasource = _get_datasource(query_context, query_obj)
+      query_obj.columns = [o.column_name for o in datasource.columns]
+
+
     if result_func:
         return result_func(query_context, query_obj, force_cached)
     raise QueryObjectValidationError(
